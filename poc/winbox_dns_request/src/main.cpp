@@ -44,7 +44,7 @@ namespace
     const char s_version[] = "Cache manipulation PoC";
 
     bool parseCommandLine(int p_argCount, const char* p_argArray[],
-                          std::string& p_ip, std::string& p_port, std::string& p_server)
+                          std::string& p_ip, std::string& p_port, std::string& p_server, std::string& p_domain)
     {
         boost::program_options::options_description description("options");
         description.add_options()
@@ -53,6 +53,7 @@ namespace
             ("port,p", boost::program_options::value<std::string>(), "The port to connect to")
             ("ip,i", boost::program_options::value<std::string>(), "The ip to connect to")
             ("server,s", boost::program_options::value<std::string>(), "The DNS server to connect to");
+            ("domain,d", boost::program_options::value<std::string>(), "The Domain to resolve");
 
         boost::program_options::variables_map argv_map;
         try
@@ -102,7 +103,8 @@ int main(int p_argc, const char** p_argv)
     std::string ip;
     std::string port;
     std::string server;
-    if (!parseCommandLine(p_argc, p_argv, ip, port, server))
+    std::string domain;
+    if (!parseCommandLine(p_argc, p_argv, ip, port, server, domain))
     {
         return EXIT_FAILURE;
     }
@@ -126,7 +128,7 @@ int main(int p_argc, const char** p_argv)
     msg.set_command(3);
     msg.set_request_id(1);
     msg.set_reply_expected(true);
-    msg.add_string(3, "example.com");
+    msg.add_string(3, domain);
     msg.add_u32(1, server_net);
     std::cout << "-> " << msg.serialize_to_json() << std::endl;
     winboxSession.send(msg);
